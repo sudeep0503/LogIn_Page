@@ -1,4 +1,4 @@
-// Elegant Portfolio Login Form JavaScript
+// Improved Elegant Portfolio Login Form JavaScript
 class ElegantPortfolioLoginForm {
     constructor() {
         this.form = document.getElementById('loginForm');
@@ -8,11 +8,14 @@ class ElegantPortfolioLoginForm {
         this.submitButton = this.form.querySelector('.signin-button');
         this.successMessage = document.getElementById('successMessage');
         this.socialButtons = document.querySelectorAll('.social-button');
+        this.rememberCheckbox = document.getElementById('remember');
 
-        // --- Temporary test credentials for local/testing only ---
+        // --- DEV: Temporary test credentials for local/testing only ---
+        // Set DEV_MODE = false before shipping production.
+        this.DEV_MODE = true;
         this.TEST_EMAIL = "test@barclays.com";
         this.TEST_PASSWORD = "Barclays123";
-        // ---------------------------------------------------------
+        // ---------------------------------------------------------------
 
         this.init();
     }
@@ -21,36 +24,66 @@ class ElegantPortfolioLoginForm {
         this.bindEvents();
         this.setupPasswordToggle();
         this.setupSocialButtons();
+        this.hydrateRememberedEmail();
     }
 
     bindEvents() {
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 
-        // CLEAR errors while typing (keep this)
+        // CLEAR errors while typing
         this.emailInput.addEventListener('input', () => this.clearError('email'));
         this.passwordInput.addEventListener('input', () => this.clearError('password'));
 
-        // For label animations
+        // For label animations (works with CSS input:not(:placeholder-shown))
         this.emailInput.setAttribute('placeholder', ' ');
         this.passwordInput.setAttribute('placeholder', ' ');
     }
 
     setupPasswordToggle() {
-        this.passwordToggle.addEventListener('click', () => {
-            const type = this.passwordInput.type === 'password' ? 'text' : 'password';
-            this.passwordInput.type = type;
+        // accessibility initial state
+        this.passwordToggle.setAttribute('aria-pressed', 'false');
+        this.passwordToggle.setAttribute('aria-label', 'Show password');
 
-            this.passwordToggle.classList.toggle('reveal-active', type === 'text');
+        this.passwordToggle.addEventListener('click', () => {
+            const showing = this.passwordInput.type === 'text';
+            const newType = showing ? 'password' : 'text';
+            this.passwordInput.type = newType;
+
+            // visual state
+            this.passwordToggle.classList.toggle('reveal-active', newType === 'text');
+
+            // accessibility state
+            this.passwordToggle.setAttribute('aria-pressed', String(newType === 'text'));
+            this.passwordToggle.setAttribute('aria-label', newType === 'text' ? 'Hide password' : 'Show password');
         });
     }
 
     setupSocialButtons() {
         this.socialButtons.forEach(button => {
+            // ensure an accessible label
+            const provider = (button.dataset.provider || button.textContent || 'Social').trim();
+            button.setAttribute('aria-label', `Sign in with ${provider}`);
+
             button.addEventListener('click', (e) => {
-                const provider = button.textContent.trim();
+                e.preventDefault();
                 this.handleSocialLogin(provider, button);
             });
         });
+    }
+
+    hydrateRememberedEmail() {
+        try {
+            const remembered = localStorage.getItem('rememberedEmail');
+            if (remembered) {
+                this.emailInput.value = remembered;
+                // Ensure label floats correctly (placeholder trick)
+                this.emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+                if (this.rememberCheckbox) this.rememberCheckbox.checked = true;
+            }
+        } catch (err) {
+            // ignore storage errors (private mode, etc.)
+            // console.warn('Could not access localStorage', err);
+        }
     }
 
     validateEmail() {
@@ -89,23 +122,29 @@ class ElegantPortfolioLoginForm {
     }
 
     showError(field, message) {
-        const formField = document.getElementById(field).closest('.form-field');
+        const el = document.getElementById(field);
+        if (!el) return;
+        const formField = el.closest('.form-field');
         const errorElement = document.getElementById(`${field}Error`);
-
-        formField.classList.add('error');
-        errorElement.textContent = message;
-        errorElement.classList.add('show');
+        if (formField) formField.classList.add('error');
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+        // focus the field for quick correction
+        el.focus();
     }
 
     clearError(field) {
-        const formField = document.getElementById(field).closest('.form-field');
+        const el = document.getElementById(field);
+        if (!el) return;
+        const formField = el.closest('.form-field');
         const errorElement = document.getElementById(`${field}Error`);
-
-        formField.classList.remove('error');
-        errorElement.classList.remove('show');
-        setTimeout(() => {
-            errorElement.textContent = '';
-        }, 200);
+        if (formField) formField.classList.remove('error');
+        if (errorElement) {
+            errorElement.classList.remove('show');
+            setTimeout(() => { errorElement.textContent = ''; }, 200);
+        }
     }
 
     async handleSubmit(e) {
@@ -114,63 +153,85 @@ class ElegantPortfolioLoginForm {
         const isEmailValid = this.validateEmail();
         const isPasswordValid = this.validatePassword();
 
-        if (!isEmailValid || !isPasswordValid) {
-            return;
-        }
+        if (!isEmailValid || !isPasswordValid) return;
 
         this.setLoading(true);
 
         try {
-            // Simulate authentication delay
+            // Simulate auth delay
             await new Promise(resolve => setTimeout(resolve, 1200));
 
-            // Check against temporary test credentials
             const email = this.emailInput.value.trim();
             const password = this.passwordInput.value;
 
-            if (email === this.TEST_EMAIL && password === this.TEST_PASSWORD) {
-                // Successful test login -> redirect to trial.html after small pause for UX
-                // keep loading state for a brief moment so user sees feedback
+            // DEV-mode test credential check (only if DEV_MODE === true)
+            if (this.DEV_MODE && email === this.TEST_EMAIL && password === this.TEST_PASSWORD) {
+                // Persist remember-me if requested
+                try {
+                    if (this.rememberCheckbox && this.rememberCheckbox.checked) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+                } catch (err) {
+                    // ignore storage errors
+                }
+
+                // Show success UI, then redirect shortly after
+                this.showSuccess();
                 setTimeout(() => {
                     window.location.href = 'trial.html';
-                }, 400);
-                return; // don't continue to show failure
+                }, 2500);
+
+                return;
             }
 
-            // If credentials don't match, show auth error
+            // TODO: Replace this block with real authentication request (fetch/XHR)
+            // For now, show auth error
             this.showError('password', 'Incorrect email or password');
 
         } catch (error) {
             this.showError('password', 'Authentication failed. Please try again.');
+            console.error(error);
         } finally {
-            // ensure loading state is cleared unless we already navigated away
-            // (if redirect occurred, page will unload before this matters)
+            // Clear loading unless we're about to navigate (if navigation happened, page unloads)
             this.setLoading(false);
         }
     }
 
     async handleSocialLogin(provider, button) {
-        console.log(`Signing in with ${provider}...`);
-
-        // Simple loading state
-        const originalHTML = button.innerHTML;
-        button.style.pointerEvents = 'none';
+        // simple loading UI using DOM APIs
+        const originalDisabled = button.disabled;
+        button.disabled = true;
         button.style.opacity = '0.7';
-        button.innerHTML = `
-            <div style="width: 16px; height: 16px; border: 2px solid #cbd5e0; border-top: 2px solid #4a5568; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            Connecting...
-        `;
+
+        const spinner = document.createElement('span');
+        spinner.setAttribute('aria-hidden', 'true');
+        spinner.style.display = 'inline-block';
+        spinner.style.width = '16px';
+        spinner.style.height = '16px';
+        spinner.style.border = '2px solid #cbd5e0';
+        spinner.style.borderTop = '2px solid #4a5568';
+        spinner.style.borderRadius = '50%';
+        spinner.style.marginRight = '8px';
+        spinner.style.animation = 'spin 1s linear infinite';
+
+        const originalText = button.textContent;
+        button.textContent = ''; // clear
+        button.appendChild(spinner);
+        button.appendChild(document.createTextNode('Connecting...'));
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1800));
-            console.log(`Redirecting to ${provider} authentication...`);
+            await new Promise(resolve => setTimeout(resolve, 1400));
+            console.log(`(Simulated) redirect to ${provider} auth`);
             // window.location.href = `/auth/${provider.toLowerCase()}`;
-        } catch (error) {
-            console.error(`${provider} sign in failed: ${error.message}`);
+        } catch (err) {
+            console.error(`${provider} sign in failed`, err);
         } finally {
-            button.style.pointerEvents = 'auto';
+            // restore
+            button.disabled = originalDisabled;
             button.style.opacity = '1';
-            button.innerHTML = originalHTML;
+            button.textContent = originalText;
         }
     }
 
@@ -178,7 +239,6 @@ class ElegantPortfolioLoginForm {
         this.submitButton.classList.toggle('loading', loading);
         this.submitButton.disabled = loading;
 
-        // Disable social buttons during loading
         this.socialButtons.forEach(button => {
             button.style.pointerEvents = loading ? 'none' : 'auto';
             button.style.opacity = loading ? '0.6' : '1';
@@ -200,15 +260,9 @@ class ElegantPortfolioLoginForm {
             if (divider) divider.style.display = 'none';
 
             // Show success message
-            this.successMessage.classList.add('show');
+            if (this.successMessage) this.successMessage.classList.add('show');
 
         }, 300);
-
-        // Redirect after success display (kept commented — test redirect uses trial.html)
-        setTimeout(() => {
-            console.log('Redirecting to your creative dashboard...');
-            // window.location.href = '/dashboard';
-        }, 3000);
     }
 }
 
