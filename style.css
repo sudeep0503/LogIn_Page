@@ -273,7 +273,8 @@ body::before {
 }
 
 .remember-checkbox input[type="checkbox"]:checked + .checkbox-custom {
-    background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+    /* background: linear-gradient(135deg, #FF6B6B, #4ECDC4); */
+    background: linear-gradient(135deg, #00AEEF, #0077C8);
     border-color: transparent;
     color: white;
 }
