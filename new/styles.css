@@ -1,0 +1,176 @@
+/* ---------- Reset ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+/* ---------- Background ---------- */
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg,
+  #2366a8,
+  #768ca0,
+  #cad6da
+);
+    color: #fff;
+}
+
+/* ---------- Stepper ---------- */
+.stepper {
+    display: flex;
+    flex-wrap: wrap;
+    width: 90%;
+    max-width: 1100px;
+    margin: 30px auto;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+/* ---------- Step ---------- */
+.step {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 64px;
+    padding-left: 44px;      /* 👈 protect text */
+    padding-right: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    white-space: nowrap;
+    background: #ad1212;
+    color: #000000;
+    margin-right: 32px;
+}
+
+/* overlap steps (except first) */
+.step:not(:first-child) {
+    margin-left: -32px;     /* 👈 pull under arrow */
+}
+
+
+
+/* ---------- Chevron ---------- */
+.step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -32px;
+    width: 32px;
+    height: 64px;
+    background: #9a99b8;           /* 👈 arrow-only color                                                     Arrows    */
+    clip-path: polygon(
+        0 0,
+        100% 50%,
+        0 100%
+    );
+    z-index: 2;
+}
+
+
+/* ---------- Chevron Divider ---------- */
+.step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    right: 0;
+    width: 1px;
+    height: 40px;
+    background: #ffffff;
+    z-index: 3;
+}
+
+/* ---------- Completed ---------- */
+.step.completed {
+    background: #b7b4ff;
+}
+
+.step.completed::after {
+    border-left-color: #ffffff;
+}
+
+/* ---------- Active ---------- */
+.step.active {
+    background: #c1bef7;
+    color: #2b2b5f;
+}
+
+/* ---------- Last Step Cleanup ---------- */
+/* .step:last-child {
+    padding-right: 28px;          /* ❌ no arrow space needed *//*
+} */
+/* .step:last-child {
+    margin-left: 0;          /* no pull-under */
+    /* padding-right: auto;     space for its arrow */
+    /* border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px; */
+/*} */
+
+/* .step:last-child::after,
+.step:last-child::before {
+    display: none;                /* ❌ remove chevron artifacts *//*
+} */
+
+.step:last-child::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -32px;
+    width: 32px;
+    height: 64px;
+    background: #9A98D6;   /* or slightly muted if you want */
+    clip-path: polygon(
+        0 0,
+        100% 50%,
+        0 100%
+    );
+    z-index: 1;            /* slightly lower = feels terminal */
+}
+
+
+.step.completed:hover::after {
+    border-left-color: #000000;   /* subtle hover contrast */
+}
+
+/* ---------- Hover (optional but classy) ---------- */
+.step.completed:hover {
+    filter: brightness(0.97);
+    cursor: pointer;
+}
+
+/* ---------- Content ---------- */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+h1 {
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* ---------- Cards ---------- */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 35px 20px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    background: rgba(255, 255, 255, 0.2);
+}
