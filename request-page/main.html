@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Raise Request</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <div class="glass-card">
+
+      <!-- LEFT (STATIC, NON-SCROLLABLE) -->
+      <div class="left-panel">
+        <img src="logo.svg" alt="Company Logo" class="logo" />
+      </div>
+
+      <!-- RIGHT (ONLY THIS SCROLLS) -->
+      <div class="right-panel">
+        <h1>Raise Your Request</h1>
+
+        <form id="requestForm">
+
+          <label>BRID ID</label>
+          <input type="text" required />
+
+          <label>Full Name</label>
+          <input type="text" required />
+
+          <label>Email Address</label>
+          <input type="email" placeholder="@barclays.com" required />
+
+          <label>Line Manager</label>
+          <input type="text" />
+
+          <label>Emergency Contact</label>
+          <input type="text" />
+
+          <label>Business Justification</label>
+          <textarea rows="3"></textarea>
+
+          <label>Office Location</label>
+          <input type="text" />
+
+          <div class="row">
+            <div>
+              <label>City</label>
+              <input type="text" />
+            </div>
+            <div>
+              <label>State</label>
+              <input type="text" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>ZIP Code</label>
+              <input type="text" />
+            </div>
+            <div>
+              <label>Country</label>
+              <input type="text" />
+            </div>
+          </div>
+
+          <p class="section-title">
+            Permission Required (Choose All checkbox):
+          </p>
+
+          <!-- GROUP 1 -->
+          <div class="permission-grid">
+            <label><input type="checkbox"> BBPLC</label>
+            <label><input type="checkbox"> WCR</label>
+            <label><input type="checkbox"> SAM</label>
+            <label><input type="checkbox"> Walks</label>
+
+            <div></div>
+            <label class="indent"><input type="checkbox"> CCR</label>
+          </div>
+
+          <hr />
+
+          <!-- GROUP 2 -->
+          <div class="permission-grid">
+            <label><input type="checkbox"> MRM</label>
+            <label><input type="checkbox"> IVU</label>
+
+            <div></div>
+            <label class="indent"><input type="checkbox"> VAST</label>
+          </div>
+
+          <hr />
+
+          <!-- TOOLVERSE (MANDATORY) -->
+          <label class="toolverse-check">
+            <input type="checkbox" checked disabled> ToolVerse
+          </label>
+
+          <button type="submit">Submit Request</button>
+
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

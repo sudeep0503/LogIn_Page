@@ -1,0 +1,279 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/* =========================
+   PAGE BACKGROUND
+========================= */
+body {
+  height: 100vh;
+  background: linear-gradient(135deg, #EAF2F7, #4BA3D3);
+  overflow: hidden;
+}
+
+/* =========================
+   PAGE WRAPPER
+========================= */
+.page-wrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* =========================
+   MAIN GLASS CARD
+========================= */
+.glass-card {
+  width: 90%;
+  max-width: 1100px;
+  height: 620px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* =========================
+   LEFT PANEL
+========================= */
+.left-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-backdrop {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  padding: 32px;
+}
+
+.logo {
+  max-width: 70%;
+  height: auto;
+  /* filter: drop-shadow(0 12px 30px rgba(0, 166, 230, 0.35)); */
+}
+
+/* =========================
+   RIGHT PANEL (SCROLLABLE)
+========================= */
+.right-panel {
+  padding: 36px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* =========================
+   HEADING
+========================= */
+.right-panel h1 {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #2C3E50;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+/* =========================
+   FORM LABELS
+========================= */
+form label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  /* color: rgba(79, 100, 117, 0.85); */
+  color: rgb(37, 45, 51);
+}
+
+/* =========================
+   INPUTS & TEXTAREA
+========================= */
+input[type="text"],
+input[type="email"],
+textarea {
+  width: 100%;
+  padding: 11px;
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255);
+  border: 1.5px solid rgba(44, 62, 80, 0.15);
+
+  color: #2C3E50;
+  outline: none;
+}
+
+textarea {
+  background: rgba(255, 255, 255);
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #7F8C8D;
+}
+
+/* =========================
+   INPUT FOCUS
+========================= */
+input:focus,
+textarea:focus {
+  border: 2px solid #00A6E6;
+  box-shadow: 0 0 0 3px rgba(0, 166, 230, 0.10);
+}
+
+/* =========================
+   GRID ROWS
+========================= */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+.section-title {
+  margin-top: 22px;
+  font-size: 13px;
+  color: #2C3E50;
+}
+
+/* =========================
+   PERMISSION CHECKBOX GRID
+========================= */
+.permission-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  column-gap: 28px;
+  row-gap: 6px;
+  color: #2C3E50;
+}
+
+.permission-grid label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.permission-grid input {
+  accent-color: #00A6E6;
+}
+
+.indent {
+  grid-column: 2;
+}
+
+/* =========================
+   DIVIDERS
+========================= */
+hr {
+  margin: 18px 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* =========================
+   TOOLVERSE CHECKBOX
+========================= */
+.toolverse-check {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #1B4F72;
+}
+
+.toolverse-check input {
+  accent-color: #00A6E6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   SUBMIT BUTTON
+========================= */
+button {
+  margin-top: 28px;
+  width: 100%;
+  padding: 14px;
+
+  border-radius: 10px;
+  border: none;
+
+  background: #00A6E6;
+  color: #FFFFFF;
+
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 12px 25px rgba(0, 166, 230, 0.45);
+}
+
+button:hover {
+  background: #0092CC;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  background: #9FCFE6;
+  color: #EAF2F7;
+}
+
+/* =========================
+   SCROLLBAR — HIDDEN BY DEFAULT
+========================= */
+.right-panel {
+  scrollbar-width: none; /* Firefox */
+}
+
+.right-panel::-webkit-scrollbar {
+  width: 0px; /* Chrome, Edge, Safari */
+}
+
+/* =========================
+   SCROLLBAR — VISIBLE WHEN ACTIVE
+========================= */
+.right-panel.show-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.right-panel.show-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+}
+
+.right-panel.show-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+  .glass-card {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel {
+    display: none;
+  }
+}
