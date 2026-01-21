@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Team Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-10">
+  <form class="max-w-lg bg-white p-6 rounded shadow space-y-4">
+    <h2 class="text-xl font-semibold">Select Teams</h2>
+
+    <!-- Team A -->
+    <div class="space-y-2">
+      <div class="flex items-center gap-2">
+        <button type="button" class="toggle font-mono" data-target="team-a">
+          ▶
+        </button>
+        <input type="checkbox" class="parent" id="teamA">
+        <label for="teamA" class="font-medium">Team A</label>
+      </div>
+
+      <div id="team-a" class="ml-6 hidden space-y-2">
+        <!-- Subteam A1 -->
+        <div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="toggle font-mono" data-target="team-a1">
+              ▶
+            </button>
+            <input type="checkbox" class="child" data-parent="teamA" id="teamA1">
+            <label for="teamA1">Subteam A1</label>
+          </div>
+
+          <div id="team-a1" class="ml-6 hidden space-y-1">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" class="child" data-parent="teamA1">
+              <span>Sub-subteam A1-I</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" class="child" data-parent="teamA1">
+              <span>Sub-subteam A1-II</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subteam A2 -->
+        <div class="flex items-center gap-2">
+          <input type="checkbox" class="child" data-parent="teamA">
+          <span>Subteam A2</span>
+        </div>
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="mt-4 bg-black text-white px-4 py-2 rounded"
+    >
+      Submit
+    </button>
+  </form>
+
+  <script>
+    // Expand / Collapse
+    document.querySelectorAll(".toggle").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = document.getElementById(btn.dataset.target);
+        target.classList.toggle("hidden");
+        btn.textContent = target.classList.contains("hidden") ? "▶" : "▼";
+      });
+    });
+
+    // Parent → Children
+    document.querySelectorAll(".parent").forEach(parent => {
+      parent.addEventListener("change", () => {
+        document
+          .querySelectorAll(`[data-parent="${parent.id}"]`)
+          .forEach(child => {
+            child.checked = parent.checked;
+          });
+      });
+    });
+
+    // Children → Parent (indeterminate state)
+    document.querySelectorAll(".child").forEach(child => {
+      child.addEventListener("change", () => {
+        const parentId = child.dataset.parent;
+        if (!parentId) return;
+
+        const parent = document.getElementById(parentId);
+        const siblings = document.querySelectorAll(
+          `[data-parent="${parentId}"]`
+        );
+
+        const checked = [...siblings].filter(c => c.checked).length;
+
+        parent.checked = checked === siblings.length;
+        parent.indeterminate = checked > 0 && checked < siblings.length;
+      });
+    });
+  </script>
+</body>
+</html>
