@@ -1,0 +1,144 @@
+# Modules/section1_table_extractor.py
+
+from docx import Document
+import pandas as pd
+from typing import List, Dict, Any
+
+
+ANCHOR_TEXT = "Section 1 - New and Amend Proposal Only"
+
+
+def _normalize_text(text: str) -> str:
+    if not text:
+        return ""
+    return " ".join(text.replace("\n", " ").split())
+
+
+def _get_cell_text(cell) -> str:
+    """
+    Extract full text including multiple paragraphs inside a cell.
+    """
+    parts = []
+    for p in cell.paragraphs:
+        t = p.text.strip()
+        if t:
+            parts.append(t)
+    return "\n".join(parts)  # keep newlines for later splitting
+
+
+def _table_to_matrix(table) -> List[List[str]]:
+    """
+    Convert python-docx table into a matrix, respecting merged cells.
+    """
+    rows = []
+    max_cols = max(len(row.cells) for row in table.rows)
+
+    for row in table.rows:
+        row_data = []
+        for cell in row.cells:
+            row_data.append(_get_cell_text(cell))
+
+        # pad missing columns (merged cells)
+        while len(row_data) < max_cols:
+            row_data.append("")
+
+        rows.append(row_data)
+
+    return rows
+
+
+def _split_multiline_rows(matrix: List[List[str]]) -> List[List[str]]:
+    """
+    If a cell has multiple lines (manual enter), expand into multiple logical rows.
+    """
+    expanded = []
+
+    for row in matrix:
+        split_cells = [cell.split("\n") for cell in row]
+        max_lines = max(len(c) for c in split_cells)
+
+        for i in range(max_lines):
+            new_row = []
+            for cell_lines in split_cells:
+                if i < len(cell_lines):
+                    new_row.append(cell_lines[i])
+                else:
+                    new_row.append("")
+            expanded.append(new_row)
+
+    return expanded
+
+
+def _is_full_row_merged(row: List[str]) -> bool:
+    """
+    Heuristic: if first cell has text and others are empty → merged row title.
+    """
+    return bool(row[0].strip()) and all(not c.strip() for c in row[1:])
+
+
+def run(docx_path: str) -> List[Dict[str, Any]]:
+    """
+    Main entry point for main_controller.py
+
+    Returns:
+        List of dict:
+        {
+            "heading": str,
+            "subtable_index": int,
+            "dataframe": pd.DataFrame
+        }
+    """
+
+    doc = Document(docx_path)
+
+    # ---- Step 1: find anchor paragraph index ----
+    anchor_index = None
+    for i, p in enumerate(doc.paragraphs):
+        if ANCHOR_TEXT.lower() in p.text.lower():
+            anchor_index = i
+            break
+
+    if anchor_index is None:
+        raise ValueError(f"Anchor heading not found in {docx_path}")
+
+    # ---- Step 2: collect tables after anchor ----
+    tables_after = []
+    for t in doc.tables:
+        # python-docx does NOT give paragraph index of table
+        # workaround: assume tables appear sequentially after anchor
+        tables_after.append(t)
+
+    # ---- Step 3: process tables ----
+    results = []
+    subtable_counter = 0
+
+    for table in tables_after:
+        matrix = _table_to_matrix(table)
+        matrix = _split_multiline_rows(matrix)
+
+        current_block = []
+        for row in matrix:
+            if _is_full_row_merged(row) and current_block:
+                # save previous block
+                df = pd.DataFrame(current_block[1:], columns=current_block[0])
+                results.append({
+                    "heading": ANCHOR_TEXT,
+                    "subtable_index": subtable_counter,
+                    "dataframe": df
+                })
+                subtable_counter += 1
+                current_block = []
+
+            current_block.append([_normalize_text(c) for c in row])
+
+        # save last block
+        if current_block and len(current_block) > 1:
+            df = pd.DataFrame(current_block[1:], columns=current_block[0])
+            results.append({
+                "heading": ANCHOR_TEXT,
+                "subtable_index": subtable_counter,
+                "dataframe": df
+            })
+            subtable_counter += 1
+
+    return results
